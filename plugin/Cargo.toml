@@ -1,0 +1,29 @@
+[package]
+name = "solidcraft-lattice"
+version = "0.1.0"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+description = "Strut lattice generator plugin for SolidCraft (craft:plugin@0.1.0)"
+publish = false
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+serde_json = "1"
+# The TPMS core shared with gyroid.exe, single-threaded for WebAssembly.
+gyroid = { path = "../gyroid", default-features = false }
+
+# The plugin's bindings to SolidCraft; only the WebAssembly build uses them.
+[target.'cfg(any(target_arch = "wasm32", lattice_check_guest))'.dependencies]
+wit-bindgen = "0.46"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(lattice_check_guest)'] }
